@@ -32,7 +32,7 @@ COPY module .
 
 # After copying so this gets run every time
 RUN set -x \
-    && curl https://raw.githubusercontent.com/topjohnwu/Magisk/master/scripts/module_installer.sh > META-INF/com/google/android/update-binary
+    && wget -qO- https://raw.githubusercontent.com/topjohnwu/Magisk/master/scripts/module_installer.sh > META-INF/com/google/android/update-binary
 
 RUN set -x \
     && zip -r9 ../module.zip .
