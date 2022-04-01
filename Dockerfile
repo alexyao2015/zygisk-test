@@ -22,12 +22,17 @@ FROM alpine:latest
 
 WORKDIR /build/module
 
+# Create directory for installer
+RUN set -x \
+    && mkdir -p META-INF/com/google/android
+
 COPY --from=zygisk-builder /buildroot/module/bin zygisk
 
+COPY module .
+
+# After copying so this gets run every time
 RUN set -x \
     && curl https://raw.githubusercontent.com/topjohnwu/Magisk/master/scripts/module_installer.sh > META-INF/com/google/android/update-binary
-
-COPY module .
 
 RUN set -x \
     && zip -r9 ../module.zip .
