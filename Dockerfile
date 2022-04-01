@@ -19,11 +19,12 @@ RUN set -x \
     && mv libs/x86_64/*.so bin/x86_64.so
 
 FROM alpine:latest
-
 WORKDIR /build/module
 
 # Create directory for installer
 RUN set -x \
+    && apk add \
+        zip \
     && mkdir -p META-INF/com/google/android
 
 COPY --from=zygisk-builder /buildroot/module/bin zygisk
