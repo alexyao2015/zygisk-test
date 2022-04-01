@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+
+jobs:
+  module:
+    name: Build Module
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: |
+            env.BUILDKIT_STEP_LOG_MAX_SIZE=10000000
+            env.BUILDKIT_STEP_LOG_MAX_SPEED=100000000
+          install: true
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        continue-on-error: true
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ${{ github.ref }}-${{ github.sha }}
+            ${{ github.ref }}-
+
+      - name: Build
+        run: |
+          docker build \
+            --tag ci:${{ github.run_number }} \
+            --progress plain \
+            --file ./Dockerfile \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new \
+            --load \
+            .
+
+      - name: Copy artifact
+        run: |
+          docker run -v ${PWD}:/tmp ci:${{ github.run_number }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: zygisk-${{ github.run_number }}
+          path: module.zip
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: zygisk-latest.zip
+          draft: true

@@ -1,0 +1,7 @@
+id=zygisk_test
+name=Zygisk Test
+version=v1.0.0
+versionCode=100
+author=alexyao2015
+description=Demo Module for zygisk.
+updateJson=https://raw.githubusercontent.com/alexyao2015/zygisk-test/master/update.json

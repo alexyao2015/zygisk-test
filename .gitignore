@@ -8,3 +8,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+zygisk/module/jni/libcxx/*

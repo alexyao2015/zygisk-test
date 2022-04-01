@@ -1,0 +1,6 @@
+{
+  "version": "v1.0.0",
+  "versionCode": 100,
+  "zipUrl": "https://www.github.com/alexyao2015/zygisk-test/releases/latest/download/zygisk-latest.zip",
+  "changelog": "https://raw.githubusercontent.com/alexyao2015/zygisk-test/master/README.md"
+}
