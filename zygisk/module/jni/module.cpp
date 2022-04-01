@@ -4,18 +4,21 @@
 #include <android/log.h>
 
 #include "zygisk.hpp"
+#include "module.h"
 
 using zygisk::Api;
 using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "Magisk", __VA_ARGS__)
 
-class MyModule : public zygisk::ModuleBase {
+namespace zygisktest {
+
+class Spoofer : public zygisk::ModuleBase {
 public:
     void onLoad(Api *api, JNIEnv *env) override {
         this->api = api;
         this->env = env;
+        this
     }
 
     void preAppSpecialize(AppSpecializeArgs *args) override {
@@ -48,17 +51,6 @@ private:
 
 };
 
-static int urandom = -1;
+REGISTER_ZYGISK_MODULE(Spoofer)
 
-static void companion_handler(int i) {
-    if (urandom < 0) {
-        urandom = open("/dev/urandom", O_RDONLY);
-    }
-    unsigned r;
-    read(urandom, &r, sizeof(r));
-    LOGD("example: companion r=[%u]\n", r);
-    write(i, &r, sizeof(r));
-}
-
-REGISTER_ZYGISK_MODULE(MyModule)
-REGISTER_ZYGISK_COMPANION(companion_handler)
+} // namespace zygisktest
