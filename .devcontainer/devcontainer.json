@@ -8,7 +8,18 @@
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		// "C_Cpp.default.compilerPath": "/opt/android-sdk-linux/ndk/23.1.7779620/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android31-clang++"
+		"editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true
+    },
+    "files.associations": {
+      "**/.vscode/*.json": "jsonc"
+    },
+    "C_Cpp.clang_format_path": "/opt/android-sdk-linux/ndk/23.1.7779620/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-format",
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
