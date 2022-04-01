@@ -38,4 +38,4 @@ RUN set -x \
 RUN set -x \
     && zip -r9 ../module.zip .
 
-CMD ["cp", "/build/module.zip", "/tmp/module.zip"]
+CMD ["cp", "/build/module.zip", "/tmp/zygisk-latest.zip"]

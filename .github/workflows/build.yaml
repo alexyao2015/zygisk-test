@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: zygisk-${{ github.run_number }}
-          path: module.zip
+          path: zygisk-latest.zip
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
