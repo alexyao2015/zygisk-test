@@ -10,47 +10,65 @@ using zygisk::Api;
 using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
+namespace zygisktest
+{
 
-namespace zygisktest {
+    class ZygiskTest : public zygisk::ModuleBase
+    {
+    public:
+        void onLoad(Api *api, JNIEnv *env) override
+        {
+            this->api = api;
+            this->env = env;
+        }
 
-class Spoofer : public zygisk::ModuleBase {
-public:
-    void onLoad(Api *api, JNIEnv *env) override {
-        this->api = api;
-        this->env = env;
-        this
+        void preAppSpecialize(AppSpecializeArgs *args) override
+        {
+            // Use JNI to fetch our process name
+            const char *process = env->GetStringUTFChars(args->nice_name, nullptr);
+            preSpecialize(process);
+            env->ReleaseStringUTFChars(args->nice_name, process);
+        }
+
+        void preServerSpecialize(ServerSpecializeArgs *args) override
+        {
+            preSpecialize("system_server");
+        }
+
+    private:
+        Api *api;
+        JNIEnv *env;
+
+        void preSpecialize(const char *process)
+        {
+            // Demonstrate connecting to to companion process
+            // We ask the companion for a random number
+            unsigned r = 0;
+            int fd = api->connectCompanion();
+            read(fd, &r, sizeof(r));
+            close(fd);
+            LOGD("example: process=[%s], r=[%u]\n", process, r);
+
+            // Since we do not hook any functions, we should let Zygisk dlclose ourselves
+            api->setOption(zygisk::Option::DLCLOSE_MODULE_LIBRARY);
+        }
+    };
+
+    static int urandom = -1;
+
+    static void companion_handler(int i)
+    {
+        if (urandom < 0)
+        {
+            urandom = open("/dev/urandom", O_RDONLY);
+        }
+        unsigned r;
+        read(urandom, &r, sizeof(r));
+        LOGD("example: companion r=[%u]\n", r);
+        write(i, &r, sizeof(r));
     }
 
-    void preAppSpecialize(AppSpecializeArgs *args) override {
-        // Use JNI to fetch our process name
-        const char *process = env->GetStringUTFChars(args->nice_name, nullptr);
-        preSpecialize(process);
-        env->ReleaseStringUTFChars(args->nice_name, process);
-    }
-
-    void preServerSpecialize(ServerSpecializeArgs *args) override {
-        preSpecialize("system_server");
-    }
-
-private:
-    Api *api;
-    JNIEnv *env;
-
-    void preSpecialize(const char *process) {
-        // Demonstrate connecting to to companion process
-        // We ask the companion for a random number
-        unsigned r = 0;
-        int fd = api->connectCompanion();
-        read(fd, &r, sizeof(r));
-        close(fd);
-        LOGD("example: process=[%s], r=[%u]\n", process, r);
-
-        // Since we do not hook any functions, we should let Zygisk dlclose ourselves
-        api->setOption(zygisk::Option::DLCLOSE_MODULE_LIBRARY);
-    }
-
-};
-
-REGISTER_ZYGISK_MODULE(Spoofer)
+    REGISTER_ZYGISK_MODULE(ZygiskTest)
+    REGISTER_ZYGISK_COMPANION(companion_handler)
 
 } // namespace zygisktest
