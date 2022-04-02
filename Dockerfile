@@ -1,4 +1,6 @@
+ARG DEBUG_BUILD=0
 FROM saschpe/android-ndk:32-jdk11.0.14.1_1-ndk23.1.7779620-cmake3.18.1 as zygisk-builder
+ARG DEBUG_BUILD
 
 RUN set -x \
     && apt-get update \
@@ -11,7 +13,7 @@ COPY zygisk .
 WORKDIR /buildroot/module
 
 RUN set -x \
-    && $NDK_ROOT/ndk-build \
+    && $NDK_ROOT/ndk-build NDK_DEBUG=$DEBUG_BUILD \
     && mkdir bin \
     && mv libs/arm64-v8a/*.so bin/arm64-v8a.so \
     && mv libs/armeabi-v7a/*.so bin/armeabi-v7a.so \
